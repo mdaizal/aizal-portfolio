@@ -371,7 +371,7 @@ Meta must be set through Angular's `Title` / `Meta` services so it renders **dur
 
 | Level | Tool | Scope | Gate |
 |-------|------|-------|------|
-| Unit | Vitest (`npm test`) | Validator accepts real data and rejects placeholders/missing entries; `SeoService` sets meta; obfuscation helper; every shared primitive renders; the timeline renders all 6 entries | Must pass; ≥80% lines on `content/` and `core/` |
+| Unit | Vitest (`npm test`) | Validator accepts real data and rejects placeholders/missing entries; `SeoService` sets meta; obfuscation helper; every shared primitive renders; the timeline renders all 6 entries. Plus `pages/home/home.spec.ts` — a 13-assertion **integration** suite over the PRD §10 acceptance criteria (one `h1`, every nav anchor, 6 roles with date ranges, 7 cards, 6 skill groups, résumé download, assembled contact address, no phone number, external links safe, About narrative length) | Must pass; ≥80% lines on `content/` and `core/` |
 | Content | `scripts/validate-content.ts` | The ten rules in §5 | **Build fails** on violation |
 | A11y | axe (manual; `@axe-core/playwright` later) | The live page and the 404 page; 0 critical/serious | Phase 4 gate |
 | E2E (optional) | Playwright | Anchors scroll correctly, résumé download, mobile menu, 404 path | Phase 9 |

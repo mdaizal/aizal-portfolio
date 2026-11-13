@@ -33,9 +33,15 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
   - **Content gate as a Vitest suite**, wired into `build:prod` — verified by injection (placeholder → exit 1)
   - 6 primitives + layout shell (skip link, header, footer) with specs
   - Gates: **47 tests pass** · lint clean · build **280 kB raw / 79 kB gzip** · 2 routes prerendered
+- [x] **Phase 3 — the seven page sections** (hero, currently, about, experience, skills, projects, contact + 404)
+  - Built as components under `pages/home/sections/`, composed by `home.html`
+  - Verified against the **prerendered build**: all 7 section ids, 1 `<h1>`, 6 timeline entries, 7 project cards, 6 skill groups
+  - Browser-verified: **zero horizontal overflow** at 320–1024 px, `light-dark()` theming with no JavaScript, `scroll-margin-top: 72px` clearing the 56 px header, mobile nav swapping correctly
+  - Gates: **60 tests** · lint clean · build 291 kB raw / 80 kB gzip
+  - Fixed: Contact lead read as one run-on; duplicate `<main>` removed from the home template
 - [ ] PRD §11 open questions — Q2 (Panasonic end date) **resolved**; Q1, Q3–Q7 remain on their defaults
 - [ ] Retire `mdaizal.github.io` (PLAN Phase 9.4)
-- [ ] Phase 3 — the seven page sections
+- [ ] Phase 4 — quality gates (SEO service, a11y pass, perf budget, Lighthouse)
 
 ## Decisions in force (PLAN §0)
 

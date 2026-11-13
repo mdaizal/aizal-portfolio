@@ -88,6 +88,34 @@ Bundle after Phase 2: **280 kB raw / 79 kB gzip** (budget ceilings are 300 kB wa
 
 ## Phase 3 — Sections
 
+**✅ Complete.** All seven sections built as components under `pages/home/sections/`, composed by `home.html`. Verified against the **prerendered production build**, not just `ng serve`.
+
+| Evidence | Result |
+|---|---|
+| Sections present in `browser/index.html` | `#top`, `#currently`, `#about`, `#experience`, `#skills`, `#projects`, `#contact` — all 7 |
+| `<h1>` count | **1** (the hero) |
+| Experience timeline entries | **6**, each with its date range (`Jun 2022 – Oct 2026` … `Dec 2006 – Jan 2008`) |
+| Project cards | **7**, with repository links on exactly the 2 that have one |
+| Skill groups | **6**, `learning` items visually distinct |
+| Prerendered page size | 76,527 bytes (real content, not a shell) |
+| `npm test` | **60 passed** (9 files), incl. 13 new integration assertions in `pages/home/home.spec.ts` |
+| Lint / build | clean · 291 kB raw / 80 kB gzip · 2 routes prerendered |
+
+Browser-verified beyond the build output:
+
+- **Theming works with zero JavaScript.** Emulating `prefers-color-scheme: dark` resolves `--canvas` to `rgb(11,15,20)` and `--ink` to `rgb(232,238,245)` from `light-dark()` alone, with no `data-theme` set.
+- **No horizontal overflow** at 320 / 360 / 390 / 768 / 1024 px (PRD NFR-6).
+- **Sticky-header anchor fix confirmed**: `scroll-margin-top` computes to `72px` = the 56 px `--header-height` + 1rem, so a jump never hides the heading.
+- **Mobile nav swaps correctly**: desktop nav `display: none`, toggle visible with `aria-expanded="false"`.
+- External links carry `rel="noopener noreferrer"`; no phone number anywhere in the rendered text.
+
+**Defects found by the visual pass and fixed:**
+
+- The Contact lead rendered as **"Available immediately — Software engineering roles — .NET-adjacent…"** — availability and the open-to statement were concatenated with an em-dash, producing one run-on. Now two sentences, assembled in a computed signal.
+- The Phase 1 placeholder home carried its **own `<main id="main">`** while the app shell provides one too. Removed — a duplicate landmark would have broken the skip link.
+
+Original plan steps, for reference:
+
 | Step | Action | Done when |
 |------|--------|-----------|
 | 3.1 | Hero `#top` — incl. the availability marker and a working résumé button | Matches PRD §6.1 |
