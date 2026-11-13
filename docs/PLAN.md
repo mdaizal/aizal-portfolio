@@ -158,9 +158,23 @@ Lesson recorded in the `angular-static-site` skill: unit tests and a token gate 
 
 `canonical`, `og:url`, `og:image` and `sitemap.xml` all require an absolute site origin, which only exists once the CloudFront distribution is created. Shipping an invented URL would be a false claim, so they are recorded here rather than guessed. Phase 6 must add all four. Note the `og-image.png` asset (1200×630) also needs creating.
 
-### Still open — do not treat Phase 4 as fully closed
+### Coverage gate — 4.1 now CLOSED
 
-- **4.1 coverage (§80% lines on `content/` and `core/`) is not formally measured.** Vitest runs without a coverage reporter here, so the threshold is asserted by nobody. Either add a coverage config and a gate, or drop the threshold from the requirement.
+Implemented in Slice C. The ≥80% lines requirement is now **enforced**, not asserted:
+
+- Provider `@vitest/coverage-v8@5.1.0` (pinned to the installed Vitest 5.1.0) — the only new dependency.
+- Scope in `angular.json`'s `test` target: `coverageInclude` = `src/app/content/**/*.ts` + `src/app/core/**/*.ts`, excluding specs; reporters `text`, `text-summary`, `json-summary`.
+- Thresholds in `vitest-base.config.mts` (80% lines per directory), loaded via the builder's `runnerConfig`.
+- `test:ci` now runs coverage, and `build:prod` runs `test:ci` — so the gate sits in the path of every production build.
+
+**Measured baseline (lines):** total **97.43%**; all seven `content/` modules **100%**; `core/obfuscate.ts` and `core/seo.service.ts` **100%**; `core/theme.ts` **94.11%** (the `matchMedia` branch, unreachable in jsdom without monkey-patching a global — correctly left uncovered rather than hacking a test). `npm run test:ci` wall clock **10 s** with coverage on; 69 tests.
+
+**Proven to fail, not just pass:** raising a threshold to 99% gives exit **1** with `ERROR: Coverage for lines (96.66%) does not meet "src/app/core/**" threshold (99%)`; restoring it gives exit **0**. A gate never observed to fail is not a gate.
+
+> **Correction to the Slice C brief.** The brief asserted the Angular builder "has no threshold option". That was wrong: `@angular/build:unit-test` **does** expose `coverageThresholds` (schema line 150, wired at `options.js:102`). It cannot express *per-directory* thresholds though, so the Vitest `runnerConfig` route was still the right implementation — but the stated reason was incorrect, and `ng test --help` does not list the option, which is what made the reconnaissance mistake. Read the builder *schema*, not `--help`.
+
+### Still open — one item
+
 - **4.6 cross-browser spot check was not done.** Every measurement above is Chromium (Chrome headless via Lighthouse; the browser harness is Chromium). Safari, Firefox and real iOS are unverified.
 
 Original plan steps, for reference:

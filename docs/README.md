@@ -45,7 +45,8 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
   - axe-core: **0 violations** on `/` and `/404/`
   - Two real defects found and fixed: `TagChip` rendered `<li>` inside a host element (broke list semantics, 13 + 52 axe violations); `opacity-80` on the skill level label dropped contrast to 3.54:1
   - **Deferred to Phase 6** (need the site origin): canonical, `og:url`, `og:image`, `sitemap.xml`
-  - **Still open:** the ≥80% coverage threshold is not measured, and the cross-browser spot check was not done
+  - **Coverage gate closed:** `test:ci` runs coverage with an 80% lines threshold for `content/**` and `core/**`, enforced through `build:prod`; measured 97.4% lines (content 100%, core 94.1–100%) and proved to fail at a 99% threshold
+  - **Still open:** cross-browser spot check (every measurement is Chromium)
 - [ ] PRD §11 open questions — Q2 (Panasonic end date) **resolved**; Q1, Q3–Q7 remain on their defaults
 - [ ] Retire `mdaizal.github.io` (PLAN Phase 9.4)
 - [ ] Phase 5 — AWS S3 bucket (owner runs the commands)

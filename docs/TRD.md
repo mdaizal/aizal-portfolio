@@ -371,7 +371,7 @@ Meta must be set through Angular's `Title` / `Meta` services so it renders **dur
 
 | Level | Tool | Scope | Gate |
 |-------|------|-------|------|
-| Unit | Vitest (`npm test`) | Validator accepts real data and rejects placeholders/missing entries; `SeoService` sets meta; obfuscation helper; every shared primitive renders; the timeline renders all 6 entries. Plus `pages/home/home.spec.ts` — a 13-assertion **integration** suite over the PRD §10 acceptance criteria (one `h1`, every nav anchor, 6 roles with date ranges, 7 cards, 6 skill groups, résumé download, assembled contact address, no phone number, external links safe, About narrative length) | Must pass; ≥80% lines on `content/` and `core/` |
+| Unit | Vitest (`npm test`) | Validator accepts real data and rejects placeholders/missing entries; `SeoService` sets meta; obfuscation helper; every shared primitive renders; the timeline renders all 6 entries. Plus `pages/home/home.spec.ts` — a 13-assertion **integration** suite over the PRD §10 acceptance criteria (one `h1`, every nav anchor, 6 roles with date ranges, 7 cards, 6 skill groups, résumé download, assembled contact address, no phone number, external links safe, About narrative length) | **Enforced**: `test:ci` runs coverage with an **80% lines threshold** for `content/**` and `core/**`, and `build:prod` calls `test:ci`, so a regression fails the production build. Thresholds live in `vitest-base.config.mts`, loaded through the builder's `runnerConfig`. Measured: **97.43% lines total** — all `content/` modules 100%, `core/obfuscate.ts` and `core/seo.service.ts` 100%, `core/theme.ts` 94.11% (the `matchMedia` branch, unreachable in jsdom without monkey-patching a global). Verified to fail at a 99% threshold. |
 | Content | `scripts/validate-content.ts` | The ten rules in §5 | **Build fails** on violation |
 | A11y | axe (manual; `@axe-core/playwright` later) | The live page and the 404 page; 0 critical/serious | Phase 4 gate |
 | E2E (optional) | Playwright | Anchors scroll correctly, résumé download, mobile menu, 404 path | Phase 9 |
@@ -542,8 +542,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
-      - run: npm test                      # includes the content validator
-      - run: npm run build:prod            # fails on budget or content violation
+      - run: npm run test:ci               # content gate + acceptance suite + coverage thresholds
+      - run: npm run build:prod            # re-runs test:ci, then builds; fails on budget or content violation
       - uses: aws-actions/configure-aws-credentials@v5   # latest major; OIDC, no static keys
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
