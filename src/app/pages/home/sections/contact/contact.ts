@@ -19,7 +19,7 @@ import { SectionHeading } from '../../../../shared/section-heading/section-headi
           title="Contact"
           headingId="contact-heading"
           eyebrow="Get in touch"
-          [lead]="profile.availability + ' — ' + profile.openTo"
+          [lead]="lead()"
         />
 
         <div class="grid gap-8 sm:grid-cols-2">
@@ -77,4 +77,11 @@ export class Contact {
   protected readonly profile = PROFILE;
   protected readonly email = computed(() => emailAddress(PROFILE));
   protected readonly mailto = computed(() => mailtoHref(PROFILE));
+
+  /**
+   * Availability and the open-to statement are separate sentences. Concatenating
+   * them with a dash produced "Available immediately — Software engineering
+   * roles — .NET-adjacent…", which reads as one run-on.
+   */
+  protected readonly lead = computed(() => `${PROFILE.availability}. ${PROFILE.openTo}`);
 }
