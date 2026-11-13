@@ -50,15 +50,23 @@
 
 ## Phase 1 — Repository & scaffold
 
-| Step | Action | Done when |
-|------|--------|-----------|
-| 1.1 | Scaffold in `E:\Go Projects\portfolio-site\`. The folder already contains `docs/` and `src/assets/`, and **`ng new` refuses a non-empty directory** — so scaffold into the folder after temporarily moving them aside: `mv docs .docs_tmp && mv src .src_tmp && ng new portfolio --directory . --style=scss --routing --skip-git && mv .docs_tmp/* docs/ && rmdir .docs_tmp && mv .src_tmp/* src/ && rmdir .src_tmp` (verify the exact CLI behaviour first; adjust if `ng new` tolerates the contents) | `npm start` serves the default page, and both `docs/` and `src/assets/aizal-resume.pdf` survived the swap intact |
-| 1.2 | `ng add @angular/ssr` (needed for prerender configuration) | Package added; `app.routes.server.ts` exists |
-| 1.3 | Set `outputMode: "static"` in `angular.json` build options | `npm run build` emits `dist/portfolio/browser/index.html` and **no** `server/` directory |
-| 1.4 | **Confirm the 404 route's prerender behaviour empirically** — build with a `404` route + a `**` route and inspect `dist/portfolio/browser/` | You can state exactly which files exist (`404/index.html`? a wildcard fallback? `index.csr.html`?). **Record the actual result in `TRD.md` §4.1 before building anything else.** This is the most likely place for the deploy to surprise you. |
-| 1.5 | Add Tailwind v4 (`.postcssrc.json` with `@tailwindcss/postcss`, `@import "tailwindcss"` in `styles.scss`) | A utility class visibly applies |
-| 1.6 | Add `.nvmrc` (`26`), `.editorconfig`, Prettier + ESLint, `.gitignore` (must include `.env.deploy`) | `npm run lint` passes on the scaffold |
-| 1.7 | `git init` in `portfolio-site`, commit `chore: scaffold`, push to the GitHub repo | Clean first commit on `main`; `E:\Go Projects` shows no change (it ignores this folder) |
+| Step | Status | What actually happened |
+|------|--------|------------------------|
+| 1.1 | ✅ | Scaffolded with `ng new portfolio --directory .` into this folder. **Two deviations from the original plan:** `--style=tailwind` (v22 offers Tailwind as a first-class style choice — it wired Tailwind v4 and `.postcssrc.json` automatically, so no separate manual step was needed) and `--ssr=true` (configures SSR *and* SSG/prerendering at creation, so `ng add @angular/ssr` proved unnecessary). Also `--zoneless=true --test-runner=vitest --package-manager=npm --skip-git --defaults`. **`ng new` did refuse the non-empty directory**, so `docs/` and the résumé PDF were staged outside the folder and restored afterwards. |
+| 1.2 | ✅ | Prerender wiring was already present from `--ssr=true`: `src/main.server.ts`, `src/app/app.config.server.ts`, `src/app/app.routes.server.ts`, `src/server.ts`. |
+| 1.3 | ✅ | `outputMode: "static"` set. Build emits **no** `dist/portfolio/server/` directory — server bundles are built as intermediates but not written to disk. |
+| 1.4 | ✅ | **Verified empirically.** `Prerendered 2 static routes.` Emitted: `browser/index.html` (9,405 B, real `<h1>`), `browser/404/index.html` (9,214 B, real `<h1>Page not found</h1>`), `browser/index.csr.html` (8,622 B, empty shell), `browser/assets/aizal-resume.pdf`, `prerendered-routes.json` = `{"/": {}, "/404": {}}`. The `RenderMode.Client` wildcard emitted nothing. **Full result recorded in `TRD.md` §4.1 — that section is authoritative.** |
+| 1.5 | ✅ | Tailwind v4 via `--style=tailwind`. `src/styles.css` has `@import 'tailwindcss';`; `.postcssrc.json` registers `@tailwindcss/postcss`. |
+| 1.6 | ✅ | `.nvmrc` (`26`), `.editorconfig`, `.prettierrc`, `eslint.config.js` (via `ng add angular-eslint` — added a working `lint` target to `angular.json`), `.gitattributes` (LF normalisation so Windows matches Linux CI), `.gitignore` extended with `.env`, `.env.*`, `.env.deploy`. `npm run lint` → **All files pass linting.** |
+| 1.7 | ⏳ | `git init -b main`, 47 files tracked, commit *"chore: scaffold Angular 22 workspace…"* on `main`, authored as Aizal. **Push blocked:** the GitHub repo does not exist yet (Phase 0.8). |
+
+**Corrections to this plan's original assumptions** (all reflected in `TRD.md`):
+
+- Assets are served from **`public/`**, not `src/assets/` — Angular 20+ copies `public/` to the output root. The résumé now lives at `public/assets/aizal-resume.pdf` and is served at `/assets/aizal-resume.pdf`. Leaving it in `src/assets/` would have silently not deployed it.
+- Styles are **`src/styles.css`**, not `.scss`, because `--style=tailwind` implies CSS.
+- **Angular's `budgets` measure raw bytes, not gzip.** The first production build *failed* because 180 kB was configured as if it were gzip while the raw initial total is 275 kB (73 kB gzip). Ceilings are now 300 kB warning / 350 kB error.
+- A cold build took ~272 s; warm builds ~10 s. Set CI timeouts accordingly.
+- `ng test` on the scaffold initially failed because `app.spec.ts` asserted the default welcome template; the spec now asserts the routing shell instead.
 
 ## Phase 2 — Design system & content layer
 

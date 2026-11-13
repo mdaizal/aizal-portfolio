@@ -15,16 +15,23 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
 
 ## Status
 
-- [x] PLAN / PRD / TRD written
-- [x] Rewritten as **v3** from Aizal's résumé (Nov 2026) — real roles, real skills, real numbers
-- [x] Node.js **26.13.1** (Active LTS) · npm **12.2.2** · Angular CLI **22.2.7** — all installed and verified
-- [x] AWS CLI 2.40.1 present and authenticated (account `323661593352`)
-- [x] Docs relocated to `E:\Go Projects\portfolio-site\docs\`
-- [x] Résumé staged at `src/assets/aizal-resume.pdf`
-- [x] Parent repo `/portfolio-site/` gitignore entry added
+**Phase 1 complete** — workspace scaffolded and the prerender behaviour verified empirically.
+
+- [x] PLAN / PRD / TRD written; rewritten as **v3** from the résumé (Nov 2026)
+- [x] Node.js **26.13.1** · npm **12.2.2** · Angular CLI **22.2.7** — installed and verified
+- [x] AWS CLI 2.40.1 authenticated (account `323661593352`)
+- [x] **Phase 1 — Angular 22 workspace scaffolded** at `E:\Go Projects\portfolio-site`
+  - `--style=tailwind` (Tailwind v4 wired automatically) · `--ssr=true` · `--zoneless=true` · `--test-runner=vitest`
+  - `outputMode: "static"` → prerendered HTML, **no** server bundle emitted
+  - Routes: `''` and `404` prerendered, `**` client-rendered (safety net only)
+  - Gates: `npm test` **2/2 pass** · `npm run lint` **clean** · `npm run build` **275 kB raw / 73 kB gzip**
+  - Commit *"chore: scaffold Angular 22 workspace…"* on `main`, 47 files, authored as Aizal
+  - **PLAN 1.4 recorded result → `TRD.md` §4.1** (verified: `browser/404/index.html` is the exact path CloudFront needs)
+- [x] Résumé staged at `public/assets/aizal-resume.pdf` → served at `/assets/aizal-resume.pdf`
+- [ ] **Push to GitHub** — the repo does not exist yet (PLAN Phase 0.8)
 - [ ] PRD §11 open questions resolved — **Q2 (employment end date) is the important one**
 - [ ] Retire `mdaizal.github.io` (PLAN Phase 9.4)
-- [ ] Implementation started — begin at PLAN Phase 1.1
+- [ ] Phase 2 — design system & content layer
 
 ## Decisions in force (PLAN §0)
 
