@@ -50,3 +50,6 @@ Thumbs.db
 
 # Local visual review screenshots — not part of the build output
 /review/
+
+# Delegation briefs handed to CLI coding agents — working notes, not repo content
+/.delegation/
