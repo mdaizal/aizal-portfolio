@@ -47,3 +47,6 @@ Thumbs.db
 .env
 .env.*
 .env.deploy
+
+# Local visual review screenshots — not part of the build output
+/review/
