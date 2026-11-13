@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { SeoService } from '../../core/seo.service';
 import { About } from './sections/about/about';
 import { Contact } from './sections/contact/contact';
 import { Currently } from './sections/currently/currently';
@@ -21,4 +22,14 @@ import { Skills } from './sections/skills/skills';
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Home {}
+export class Home {
+  private readonly seo = inject(SeoService);
+
+  constructor() {
+    this.seo.apply({
+      title: 'Mohd Aizal Baharuddin — Software Engineer · .NET / AWS',
+      description:
+        'Software Engineer with 5+ years of .NET development across 19 years in software delivery. Now building on AWS. Available immediately.',
+    });
+  }
+}

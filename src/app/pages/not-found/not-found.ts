@@ -1,12 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { SeoService } from '../../core/seo.service';
 import { ButtonLink } from '../../shared/button-link/button-link';
 
 /**
  * Not found (PRD §6.8) — prerendered to /404/index.html and wired to CloudFront
  * custom error responses for origin 403 and 404. Must return HTTP 404, never 200.
  *
- * The `noindex` meta is applied by the SEO service in Phase 4. No `<main>` here:
- * the app shell already provides `<main id="main">`.
+ * No `<main>` here: the app shell already provides `<main id="main">`.
+ * Metadata, including `noindex`, is applied by the SEO service.
  */
 @Component({
   selector: 'app-not-found',
@@ -27,4 +28,14 @@ import { ButtonLink } from '../../shared/button-link/button-link';
     </section>
   `,
 })
-export class NotFound {}
+export class NotFound {
+  private readonly seo = inject(SeoService);
+
+  constructor() {
+    this.seo.apply({
+      title: 'Page not found — Mohd Aizal Baharuddin',
+      description: 'That page does not exist.',
+      noindex: true,
+    });
+  }
+}
