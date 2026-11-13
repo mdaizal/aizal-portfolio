@@ -1,0 +1,43 @@
+<article class="flex h-full flex-col rounded-lg border border-border bg-surface p-6 shadow-sm">
+  <header>
+    <h3 class="text-lg font-semibold text-ink">{{ project().title }}</h3>
+    <p class="mt-1 text-xs font-medium uppercase tracking-wider text-ink-muted">
+      {{ project().period }}
+    </p>
+  </header>
+
+  <p class="mt-3 text-ink-muted">{{ project().summary }}</p>
+
+  @if (project().bullets.length > 0) {
+    <ul class="mt-4 space-y-1.5 text-sm text-ink-muted">
+      @for (bullet of project().bullets; track bullet) {
+        <li class="flex gap-2">
+          <span aria-hidden="true" class="text-accent">&ndash;</span>
+          <span>{{ bullet }}</span>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (project().tags.length > 0) {
+    <ul class="mt-4 flex flex-wrap gap-2">
+      @for (tag of project().tags; track tag) {
+        <app-tag-chip [label]="tag" />
+      }
+    </ul>
+  }
+
+  @if (project().repoUrl || project().liveUrl || project().writeUpUrl) {
+    <div class="mt-auto flex flex-wrap gap-3 pt-5">
+      @if (project().repoUrl; as repo) {
+        <app-button-link [href]="repo" label="Repository" variant="ghost" [external]="true" />
+      }
+      @if (project().liveUrl; as live) {
+        <app-button-link [href]="live" label="Live site" variant="ghost" [external]="true" />
+      }
+      @if (project().writeUpUrl; as write) {
+        <app-button-link [href]="write" label="Write-up" variant="ghost" [external]="true" />
+      }
+    </div>
+  }
+</article>

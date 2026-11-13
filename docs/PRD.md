@@ -284,7 +284,7 @@ None in v1. If wanted later, choose a cookieless, consent-free option and record
 | # | Question | Default if unanswered |
 |---|---|---|
 | Q1 | Phone number on the public page? | **No** — it stays in the downloadable PDF only |
-| Q2 | The résumé says Panasonic ended **Oct 2026** and "available from 1 November 2026", but LinkedIn still shows it as current. Confirm the end date, since the hero's availability line depends on it | Use the résumé: Jun 2022 – Oct 2026, available immediately |
+| Q2 | ~~Confirm the Panasonic end date~~ **RESOLVED 2026-11-13:** the owner confirmed the role ended **Oct 2026** and he is **available immediately**. The hero, `Currently` and Contact availability lines are correct as written. | Closed |
 | Q3 | Project periods — the résumé doesn't date the internal systems | Show "Panasonic · 2022–2026" for all five; never invent year ranges |
 | Q4 | TypeScript label | `learning` until this site ships, then upgrade to `working` |
 | Q5 | React is on LinkedIn but not on the résumé — dropped from skills. Confirm | Dropped |

@@ -1,3 +1,121 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/* ===========================================================================
+   Design tokens (TRD §6.1)
+
+   Each token is declared ONCE using CSS `light-dark()`, which resolves from the
+   used `color-scheme`. That gives three behaviours with no runtime script and no
+   CSP conflict (an inline theme-init script would be blocked by `script-src 'self'`):
+
+     1. no explicit choice + OS dark  -> dark tokens (no flash, no JS at all)
+     2. no explicit choice + OS light -> light tokens
+     3. `data-theme` set on <html>    -> that theme wins
+
+   `@theme inline` maps the tokens to Tailwind, so `bg-surface` compiles to
+   `var(--surface)` and follows the active theme automatically.
+
+   `--border` is for decorative dividers and has no contrast minimum.
+   `--border-strong` is for interactive control boundaries and MUST meet 3:1.
+   `scripts/check-contrast.mjs` verifies every pair below and fails on regression.
+   =========================================================================== */
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-available: var(--available);
+  --color-learning: var(--learning);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+  --shadow-md: 0 4px 16px rgb(0 0 0 / 0.1);
+}
+
+:root {
+  /* `light dark` lets the OS preference decide until an explicit choice is made. */
+  color-scheme: light dark;
+
+  /* light value, dark value */
+  --canvas: light-dark(#ffffff, #0b0f14);
+  --surface: light-dark(#f5f7fa, #141b23);
+  --surface-2: light-dark(#eaeef4, #1b242e);
+  --border: light-dark(#cbd5e1, #2a3644);
+  --border-strong: light-dark(#6b7686, #64748b);
+  --ink: light-dark(#0f172a, #e8eef5);
+  --ink-muted: light-dark(#475569, #9fb0c3);
+  --accent: light-dark(#1d4ed8, #7db1ff);
+  --accent-ink: light-dark(#ffffff, #08131f);
+  --available: light-dark(#15803d, #4ade80);
+  --learning: light-dark(#b45309, #fbbf24);
+
+  --header-height: 3.5rem;
+}
+
+/* An explicit choice overrides the OS preference. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Smooth anchor scrolling only when the user has not asked for less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+
+  /* Sticky header must never cover the heading an anchor jumps to. */
+  section[id],
+  [id]:where(section) {
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Respect reduced motion for every transition and animation. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
