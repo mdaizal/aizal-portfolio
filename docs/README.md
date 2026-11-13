@@ -24,7 +24,7 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
   - `--style=tailwind` (Tailwind v4 wired automatically) · `--ssr=true` · `--zoneless=true` · `--test-runner=vitest`
   - `outputMode: "static"` → prerendered HTML, **no** server bundle emitted
   - Routes: `''` and `404` prerendered, `**` client-rendered (safety net only)
-  - Gates: `npm test` **2/2 pass** · `npm run lint` **clean** · `npm run build` **275 kB raw / 73 kB gzip**
+  - Gates: `npm test` **2/2 pass** · `npm run lint` **clean** · `npm run build:prod` **241 kB raw / 68 kB gzip**
   - Commit *"chore: scaffold Angular 22 workspace…"* on `main`, 47 files, authored as Aizal
   - **PLAN 1.4 recorded result → `TRD.md` §4.1** (verified: `browser/404/index.html` is the exact path CloudFront needs)
 - [x] Résumé staged at `public/assets/aizal-resume.pdf` → served at `/assets/aizal-resume.pdf`
