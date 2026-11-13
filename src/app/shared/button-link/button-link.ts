@@ -16,6 +16,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
       [href]="href()"
       [attr.target]="external() ? '_blank' : null"
       [attr.rel]="external() ? 'noopener noreferrer' : null"
+      [attr.download]="download() ? '' : null"
       [class]="classes()"
     >
       {{ label() }}@if (external()) {<span class="sr-only"> (opens in a new tab)</span>}
@@ -27,6 +28,8 @@ export class ButtonLink {
   readonly label = input.required<string>();
   readonly variant = input<ButtonVariant>('primary');
   readonly external = input(false);
+  /** Adds `download` so the browser saves the target instead of navigating to it. */
+  readonly download = input(false);
 
   private static readonly BASE =
     'inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors';
