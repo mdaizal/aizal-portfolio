@@ -69,38 +69,47 @@
 | Automation | GitHub Actions | — | OIDC → least-privilege IAM role |
 | IaC (deferred) | AWS CDK or Terraform | — | Phase 9.3 |
 
-## 3. Repository layout
+## 3. Repository layout — as built (Phase 2)
 
-Root: `E:\Go Projects\portfolio-site\` — **this folder is the repo root**, and it already contains `docs/` and `src/assets/aizal-resume.pdf` before scaffolding (see PLAN 1.1).
+Root: `E:\Go Projects\portfolio-site\` — **this folder is the repo root** (the Angular project was scaffolded into it with `--directory .`).
 
 ```
 portfolio-site/
-├─ .github/workflows/deploy.yml
-├─ docs/  PLAN.md  PRD.md  TRD.md  RUNBOOK.md  _archive/
+├─ .github/workflows/deploy.yml       # Phase 7
+├─ .gitattributes  .gitignore  .nvmrc  .postcssrc.json  .prettierrc  .editorconfig
+├─ eslint.config.js
+├─ docs/  PLAN.md  PRD.md  TRD.md  README.md  RUNBOOK.md (Phase 8)  _archive/
 ├─ scripts/
-│  ├─ validate-content.ts     # build-time content gate
-│  ├─ deploy.sh               # deploy (git-bash), includes the dist guard
-│  └─ verify-deploy.sh        # post-deploy verification
+│  ├─ check-contrast.mjs              ✅ parses tokens from styles.css; gates 24 WCAG AA pairs
+│  ├─ deploy.sh                       # Phase 7 — deploy with the dist-guard assertion
+│  └─ verify-deploy.sh                # Phase 8 — post-deploy verification
+├─ public/                            # copied to the output root by the builder
+│  ├─ favicon.ico
+│  └─ assets/aizal-resume.pdf         ✅ served at /assets/aizal-resume.pdf
 ├─ src/
 │  ├─ app/
-│  │  ├─ app.ts / app.html / app.scss
-│  │  ├─ app.config.ts         # provideZonelessChangeDetection, provideRouter, provideClientHydration
-│  │  ├─ app.routes.ts         # '' → Home, '404' → NotFound, '**' → NotFound
-│  │  ├─ app.routes.server.ts  # RenderMode per route (see §4.1)
+│  │  ├─ app.ts  app.html             # shell: skip link → header → <main id="main"> → footer
+│  │  ├─ app.config.ts                # provideZonelessChangeDetection, provideRouter, provideClientHydration
+│  │  ├─ app.routes.ts                # '' → Home, '404' → NotFound, '**' → NotFound
+│  │  ├─ app.routes.server.ts         # RenderMode per route (see §4.1 recorded result)
+│  │  ├─ app.spec.ts
 │  │  ├─ core/
-│  │  │  ├─ seo.service.ts     # title/description/canonical/OG via Title + Meta services
-│  │  │  ├─ obfuscate.ts       # email assembly
-│  │  │  └─ active-section.ts  # IntersectionObserver scroll-spy (progressive enhancement)
-│  │  ├─ content/  models.ts  profile.ts  experience.ts  skills.ts  projects.ts  certs.ts
+│  │  │  ├─ theme.ts                  ✅ ThemeService: data-theme + localStorage (TRD §6.1)
+│  │  │  ├─ obfuscate.ts              ✅ split contact address assembly
+│  │  │  └─ seo.service.ts            → Phase 4
+│  │  ├─ content/
+│  │  │  ├─ models.ts  profile.ts  experience.ts  skills.ts  projects.ts  certs.ts
+│  │  │  └─ content.validation.spec.ts ✅ the content gate (TRD §5)
 │  │  ├─ layout/   header/  footer/  skip-link/  monogram/
-│  │  ├─ shared/   section-heading/  tag-chip/  project-card/  timeline-entry/  skill-group/  button-link/
+│  │  ├─ shared/   section-heading/  tag-chip/  button-link/  project-card/  timeline-entry/  skill-group/
 │  │  └─ pages/    home/  not-found/
-│  ├─ assets/  aizal-resume.pdf ✅  og-image.png  favicon*  icons/
-│  ├─ styles.scss              # @import "tailwindcss"; tokens; base layer
-│  └─ index.html
-├─ angular.json  package.json  package-lock.json  .nvmrc  .postcssrc.json  .gitignore
-└─ README.md
+│  ├─ styles.css                      # @import 'tailwindcss'; light-dark() tokens; base layer; focus + scroll-margin
+│  ├─ index.html  main.ts  main.server.ts  server.ts
+│  └─ app/app.css                     # scaffolded, currently unused
+└─ angular.json  package.json  package-lock.json  tsconfig*.json  README.md
 ```
+
+Note: `core/active-section.ts` from the original plan was **not** created — the scroll-spy lives inside `layout/header/header.ts` as an `afterNextRender` IntersectionObserver, since only the header consumes it. `core/seo.service.ts` is scheduled for Phase 4.
 
 ## 4. Angular application architecture
 
@@ -229,7 +238,7 @@ export interface Project {
 export interface Cert { name: string; issuer: string; status: 'earned' | 'in-progress' | 'planned'; target?: string; url?: string }
 ```
 
-**Build-time validator** (`scripts/validate-content.ts`, runs before `ng build`):
+**Content gate** — implemented as a Vitest suite (`src/app/content/content.validation.spec.ts`), not a standalone script as originally planned. `npm run build:prod` is `npm run test:ci && ng build --configuration production`, so a content violation fails the build exactly as a pre-build script would. Rationale: the spec gets TypeScript, real imports and the existing runner for free, with no extra dependency (`tsx`, `esbuild-register`). Rules:
 
 1. Fail if any string field contains `{{` or `TODO`.
 2. Fail if `experience.length < 6` — the six entries are what evidence both the 5+ years and the 19 years (PRD §2).
@@ -244,24 +253,35 @@ export interface Cert { name: string; issuer: string; status: 'earned' | 'in-pro
 
 ## 6. Styling & design system
 
-### 6.1 Tokens
-Defined in `styles.scss` under Tailwind v4's `@theme` (or as plain custom properties). Components use tokens only — **no raw hex in component styles**.
+### 6.1 Tokens — as implemented (Phase 2)
+
+The file is **`src/styles.css`**, not `styles.scss`: `ng new --style=tailwind` implies CSS component styles. Tokens are declared **once** in `:root` using CSS **`light-dark()`**, then mapped into Tailwind with `@theme inline` so `bg-surface` compiles to `var(--surface)` and follows the active theme.
 
 ```
---color-bg, --color-surface, --color-border
---color-fg, --color-muted, --color-accent, --color-accent-fg
---color-available   (the availability dot/marker)
---color-learning    (distinct accent for `learning` skill labels — PRD FR-5.3)
---font-sans, --font-mono
---text-xs … --text-3xl
---space-1 … --space-16
+--canvas  --surface  --surface-2  --border  --border-strong
+--ink  --ink-muted  --accent  --accent-ink
+--available   (availability marker)
+--learning    (distinct accent for `learning` skill labels — PRD FR-5.3)
+--font-sans  --font-mono
 --radius-sm|md|lg|full
 --shadow-sm|md
---header-height     (drives scroll-margin-top)
+--header-height   (drives scroll-margin-top)
 ```
 
-- Light + dark via `prefers-color-scheme`, plus a manual override attribute (`[data-theme="dark"]`) persisted in `localStorage` behind try/catch.
-- Contrast: text ≥ 4.5:1; large text and UI/borders ≥ 3:1.
+**Theme resolution — three cases, no runtime script:**
+
+| Case | Behaviour |
+|---|---|
+| No explicit choice, OS dark | Dark tokens via `light-dark()`. No flash, no JavaScript. |
+| No explicit choice, OS light | Light tokens. |
+| `data-theme` set on `<html>` | That theme wins (`:root[data-theme='dark'] { color-scheme: dark }`). |
+
+> **Deviation from the original design.** The plan specified an inline `<script>` in `index.html` to set the theme before first paint. That is **blocked by this project's own CSP** (`script-src 'self'`, §12). Instead: `light-dark()` handles the OS-preference case with zero JS, and the stored explicit choice is applied in `main.ts` before `bootstrapApplication`, so the flash window is only the bundle-load gap for users whose choice differs from their OS.
+
+- Type scale and spacing use **Tailwind's defaults** rather than custom `--text-*`/`--space-*` tokens — a deliberate simplification, since nothing needed to diverge.
+- `--border` is decorative (no minimum); `--border-strong` is for interactive control boundaries and MUST meet 3:1 (WCAG 1.4.11).
+- Contrast is **gated, not asserted**: `scripts/check-contrast.mjs` parses the tokens out of `styles.css` and fails on any pair below its required ratio. Current state: **24 pairs, 0 failures** (lowest: `learning`-on-surface 4.68:1 light, `border-strong`-on-surface 3.64:1 dark).
+- Components use tokens only — **no raw hex in component styles**.
 
 ### 6.2 Breakpoints
 

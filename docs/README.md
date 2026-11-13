@@ -15,7 +15,7 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
 
 ## Status
 
-**Phase 1 complete** — workspace scaffolded and the prerender behaviour verified empirically.
+**Phase 2 complete** — design system, typed content layer, primitives and app shell.
 
 - [x] PLAN / PRD / TRD written; rewritten as **v3** from the résumé (Nov 2026)
 - [x] Node.js **26.13.1** · npm **12.2.2** · Angular CLI **22.2.7** — installed and verified
@@ -24,14 +24,18 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
   - `--style=tailwind` (Tailwind v4 wired automatically) · `--ssr=true` · `--zoneless=true` · `--test-runner=vitest`
   - `outputMode: "static"` → prerendered HTML, **no** server bundle emitted
   - Routes: `''` and `404` prerendered, `**` client-rendered (safety net only)
-  - Gates: `npm test` **2/2 pass** · `npm run lint` **clean** · `npm run build:prod` **241 kB raw / 68 kB gzip**
-  - Commit *"chore: scaffold Angular 22 workspace…"* on `main`, 47 files, authored as Aizal
   - **PLAN 1.4 recorded result → `TRD.md` §4.1** (verified: `browser/404/index.html` is the exact path CloudFront needs)
-- [x] Résumé staged at `public/assets/aizal-resume.pdf` → served at `/assets/aizal-resume.pdf`
-- [ ] **Push to GitHub** — the repo does not exist yet (PLAN Phase 0.8)
-- [ ] PRD §11 open questions resolved — **Q2 (employment end date) is the important one**
+  - Pushed to `origin/main`
+- [x] **Phase 2 — design system, content layer, primitives, app shell**
+  - Tokens via CSS **`light-dark()`** + `@theme inline`; OS preference by default, `data-theme` override applied pre-boot in `main.ts` (an inline theme script would be blocked by the CSP)
+  - **`scripts/check-contrast.mjs`: 24 WCAG AA pairs, 0 failures**
+  - Content from the résumé: 6 experience entries, 7 projects, 6 skill groups
+  - **Content gate as a Vitest suite**, wired into `build:prod` — verified by injection (placeholder → exit 1)
+  - 6 primitives + layout shell (skip link, header, footer) with specs
+  - Gates: **47 tests pass** · lint clean · build **280 kB raw / 79 kB gzip** · 2 routes prerendered
+- [ ] PRD §11 open questions — Q2 (Panasonic end date) **resolved**; Q1, Q3–Q7 remain on their defaults
 - [ ] Retire `mdaizal.github.io` (PLAN Phase 9.4)
-- [ ] Phase 2 — design system & content layer
+- [ ] Phase 3 — the seven page sections
 
 ## Decisions in force (PLAN §0)
 

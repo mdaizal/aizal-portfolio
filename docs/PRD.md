@@ -163,7 +163,7 @@ Sticky header: display name (scrolls to `#top`), `About / Experience / Skills / 
 |----|-------------|--------|
 | NFR-1 | Lighthouse mobile (live URL) | Perf ≥ 95, A11y ≥ 95, Best Practices ≥ 95, SEO 100 |
 | NFR-2 | Core Web Vitals | LCP < 2.0 s throttled, CLS < 0.05, INP < 200 ms |
-| NFR-3 | Bundle budget | ≤ 200 KB **gzip** initial transfer (JS + CSS combined). Enforced in CI via Angular's `budgets`, which measure **raw** size — so the configured raw ceilings are 300 kB warning / 350 kB error. Measured baseline: **241 kB raw = 68 kB gzip** (varies with build cache; ~275 kB raw on a cold build) |
+| NFR-3 | Bundle budget | ≤ 200 KB **gzip** initial transfer (JS + CSS combined). Enforced in CI via Angular's `budgets`, which measure **raw** size — so the configured raw ceilings are 300 kB warning / 350 kB error. Measured: **280 kB raw = 79 kB gzip** after Phase 2 |
 | NFR-4 | Accessibility | WCAG 2.2 AA — contrast ≥ 4.5:1, full keyboard operation, visible focus, skip link, `prefers-reduced-motion` respected, exactly one `<h1>`, a 6-entry timeline that reads correctly in a screen reader |
 | NFR-5 | SEO | Unique `<title>` + description, canonical, OG/Twitter card with a 1200×630 image, `sitemap.xml`, `robots.txt`, JSON-LD `Person` |
 | NFR-6 | Responsive | 320 px → 2560 px; no horizontal scroll at 320 px |

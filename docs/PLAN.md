@@ -70,13 +70,21 @@
 
 ## Phase 2 — Design system & content layer
 
-| Step | Action | Done when |
-|------|--------|-----------|
-| 2.1 | Design tokens as CSS custom properties: colour, type scale, spacing, radii, shadows; light + dark | Every token pair passes 4.5:1 (text) / 3:1 (UI) contrast |
-| 2.2 | Layout shell: sticky header (name, 5 anchors, résumé button, GitHub + LinkedIn), footer, skip link, monogram block | Usable at 375 px and 1440 px; anchors not covered by the sticky header |
-| 2.3 | Typed content modules per `PRD.md` §8: `profile.ts`, `experience.ts` (**6 entries**), `skills.ts`, `projects.ts` (**7 cards**), `certs.ts`, `models.ts` | All fields typed, zero `any`, PRD content transcribed, résumé PDF linked as `/assets/aizal-resume.pdf` |
-| 2.4 | Reusable primitives: `SectionHeading`, `TagChip`, `ProjectCard`, `TimelineEntry`, `SkillGroup`, `ButtonLink` | Each has a passing unit test |
-| 2.5 | Content validator (`scripts/validate-content.ts`) — fails the build on `{{`, `TODO`, or missing minimums (TRD §5) | Build fails when a placeholder is injected deliberately |
+| Step | Status | What actually happened |
+|------|--------|------------------------|
+| 2.1 | ✅ | Tokens declared once using CSS **`light-dark()`** in `src/styles.css`, mapped into Tailwind via `@theme inline`. The OS preference applies with zero JavaScript; an explicit choice sets `data-theme` on `<html>`. **Deviation from the plan:** the original design used an inline `<script>` in `index.html` to set the theme before first paint — that is blocked by the project's own `script-src 'self'` CSP, so the stored override is applied in `main.ts` before bootstrap instead, and `light-dark()` covers the no-choice case with no flash at all. Documented in `TRD.md` §6.1. |
+| 2.2 | ✅ | `layout/skip-link`, `layout/header` (sticky, 5 anchors, résumé, GitHub + LinkedIn, theme toggle, accessible mobile menu, `IntersectionObserver` scroll-spy with `aria-current`), `layout/footer`, `layout/monogram`. Wired into `app.html` as skip link → header → `<main id="main">` → footer. |
+| 2.3 | ✅ | `models.ts`, `profile.ts`, `experience.ts` (**6 entries**), `skills.ts` (**6 groups**), `projects.ts` (**7 cards**), `certs.ts`. Contact address stored split (`emailUser`/`emailDomain`) so the contiguous string never reaches the bundle. |
+| 2.4 | ✅ | Primitives with specs: `SectionHeading`, `TagChip`, `ButtonLink`, `ProjectCard`, `TimelineEntry`, `SkillGroup`. Small presentational primitives use inline templates; `ProjectCard` and `TimelineEntry` use separate `.html` files. |
+| 2.5 | ✅ | **Deviation from the plan:** validation is a Vitest suite (`content.validation.spec.ts`, 10 rules) rather than `scripts/validate-content.ts`, and `build:prod` is now `npm run test:ci && ng build --configuration production`. Same guarantee, no extra dependency, and it gets TypeScript and real imports for free. **Verified by injection:** replacing `availability` with `{{FILL_ME}}` makes `build:prod` exit **1**; restoring it exits **0**. |
+| 2.6 | ✅ | `scripts/check-contrast.mjs` (not in the original plan) parses the tokens out of `styles.css` and gates every foreground/background pair. **24 pairs, 0 failures** — lowest light `learning`-on-surface 4.68:1, lowest dark `border-strong`-on-surface 3.64:1. |
+
+**Defects the gates caught during Phase 2** (both real, both fixed):
+
+- `ButtonLink` used a **property** binding for `target`, and `HTMLAnchorElement.target` coerces `null` to the string `"null"` — every internal link would have shipped `target="null"`. Now `[attr.target]`.
+- `@angular-eslint/template/interactive-supports-focus` correctly rejected a `(keydown)` handler on the non-focusable `<header>`; Escape/Tab handling moved to a component `host` listener.
+
+Bundle after Phase 2: **280 kB raw / 79 kB gzip** (budget ceilings are 300 kB warning / 350 kB error).
 
 ## Phase 3 — Sections
 
