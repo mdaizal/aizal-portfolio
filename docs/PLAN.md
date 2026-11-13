@@ -129,13 +129,49 @@ Original plan steps, for reference:
 
 ## Phase 4 — Quality gates
 
+**✅ Met for NFR-1 and NFR-2. Two items remain open (see the bottom of this block).**
+
+Division of labour: the SEO slice and the accessibility fixes were implemented by the **Pi CLI** from written briefs in `.delegation/`; the axe/Lighthouse measurement, diff review, gate re-runs and commits were done by the supervising agent. No delegate output was accepted without independent verification.
+
+**Lighthouse, mobile, against the built output served statically:**
+
+| Category | Before the a11y fixes | After | NFR-1 target | |
+|---|---|---|---|---|
+| performance | 96 | **100** | ≥95 | ✅ |
+| accessibility | **86** | **100** | ≥95 | ✅ |
+| best-practices | 100 | **100** | ≥95 | ✅ |
+| seo | 100 | **100** | =100 | ✅ |
+
+**NFR-2:** LCP **1.3 s** (< 2.0), CLS **0.001** (< 0.05), TBT **70 ms** (was 210 ms).
+**axe-core:** 0 violations on both `/` (34 passes) and `/404/` (33 passes).
+
+### Two real defects found — and why the gates missed them
+
+Both were invisible to unit tests and to the design-token contrast gate, because both only exist in the **assembled DOM**:
+
+1. **`TagChip` rendered an `<li>`.** Angular inserts the component's host element between parent and child, so the shipped DOM was `ul > app-tag-chip > li` — axe `list` (13 nodes) and `listitem` (52 nodes), both serious. Fixed by rendering a `<span>` and having parents emit the `<li>`. A component tested in isolation has no `<ul>` parent, so no unit test could see it.
+2. **`opacity-80` on the skill level label silently broke contrast.** The rendered colour became `#c3753a` on white = **3.54:1** (needs 4.5:1), where the token pair alone measures 5.02:1. The token gate compares token pairs, not blended text.
+
+Lesson recorded in the `angular-static-site` skill: unit tests and a token gate are cheap early checks, but **measure the assembled artifact** before claiming an accessibility target.
+
+### Deliberately deferred to Phase 6 (the origin does not exist yet)
+
+`canonical`, `og:url`, `og:image` and `sitemap.xml` all require an absolute site origin, which only exists once the CloudFront distribution is created. Shipping an invented URL would be a false claim, so they are recorded here rather than guessed. Phase 6 must add all four. Note the `og-image.png` asset (1200×630) also needs creating.
+
+### Still open — do not treat Phase 4 as fully closed
+
+- **4.1 coverage (§80% lines on `content/` and `core/`) is not formally measured.** Vitest runs without a coverage reporter here, so the threshold is asserted by nobody. Either add a coverage config and a gate, or drop the threshold from the requirement.
+- **4.6 cross-browser spot check was not done.** Every measurement above is Chromium (Chrome headless via Lighthouse; the browser harness is Chromium). Safari, Firefox and real iOS are unverified.
+
+Original plan steps, for reference:
+
 | Step | Action | Done when |
 |------|--------|-----------|
 | 4.1 | Vitest: content modules, validator, obfuscation helper, every primitive | `npm test` green; ≥80% lines on `content/` and `core/` |
-| 4.2 | Accessibility: WCAG 2.2 AA — contrast, keyboard-only pass, focus visible, skip link, `prefers-reduced-motion`, timeline semantics | 0 axe violations; Lighthouse a11y ≥ 95 |
+| 4.2 | Accessibility: WCAG 2.2 AA — contrast, keyboard-only pass, focus visible, skip link, `prefers-reduced-motion` | 0 axe violations; Lighthouse a11y ≥ 95 |
 | 4.3 | SEO: title/description, canonical, OG/Twitter (1200×630 image), `robots.txt`, `sitemap.xml`, JSON-LD `Person`, favicon set | Lighthouse SEO = 100 |
 | 4.4 | Performance: budgets enforced, résumé PDF and OG image sized, no layout shift | Lighthouse Perf ≥ 95 mobile; LCP < 2.0 s throttled |
-| 4.5 | Preview the real static output with a plain static server (not `ng serve`) | Prerendered HTML and anchor behaviour match production |
+| 4.5 | Preview the real static output with a plain static server (not `ng serve`) | Prerendered HTML and anchors behave as they will in production |
 | 4.6 | Cross-browser/device spot check | No breakage in Chrome, Edge, Firefox, Safari/iOS |
 
 ## Phase 5 — AWS: S3 bucket *(you run these)*

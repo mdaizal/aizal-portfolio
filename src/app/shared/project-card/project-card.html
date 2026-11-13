@@ -22,7 +22,7 @@
   @if (project().tags.length > 0) {
     <ul class="mt-4 flex flex-wrap gap-2">
       @for (tag of project().tags; track tag) {
-        <app-tag-chip [label]="tag" />
+        <li><app-tag-chip [label]="tag" /></li>
       }
     </ul>
   }

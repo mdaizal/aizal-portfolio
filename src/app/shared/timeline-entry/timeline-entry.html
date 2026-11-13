@@ -30,7 +30,7 @@
   @if (entry().tags.length > 0) {
     <ul class="mt-3 flex flex-wrap gap-2">
       @for (tag of entry().tags; track tag) {
-        <app-tag-chip [label]="tag" />
+        <li><app-tag-chip [label]="tag" /></li>
       }
     </ul>
   }

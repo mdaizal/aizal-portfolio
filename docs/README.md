@@ -39,9 +39,17 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
   - Browser-verified: **zero horizontal overflow** at 320–1024 px, `light-dark()` theming with no JavaScript, `scroll-margin-top: 72px` clearing the 56 px header, mobile nav swapping correctly
   - Gates: **60 tests** · lint clean · build 291 kB raw / 80 kB gzip
   - Fixed: Contact lead read as one run-on; duplicate `<main>` removed from the home template
+- [x] **Phase 4 — quality gates** (SEO metadata implemented by Pi; a11y fixes implemented by Pi; measurement + review by the supervisor)
+  - Lighthouse on the built output: **performance 100 · accessibility 100 · best-practices 100 · SEO 100** — NFR-1 met
+  - NFR-2: LCP 1.3 s · CLS 0.001 · TBT 70 ms
+  - axe-core: **0 violations** on `/` and `/404/`
+  - Two real defects found and fixed: `TagChip` rendered `<li>` inside a host element (broke list semantics, 13 + 52 axe violations); `opacity-80` on the skill level label dropped contrast to 3.54:1
+  - **Deferred to Phase 6** (need the site origin): canonical, `og:url`, `og:image`, `sitemap.xml`
+  - **Still open:** the ≥80% coverage threshold is not measured, and the cross-browser spot check was not done
 - [ ] PRD §11 open questions — Q2 (Panasonic end date) **resolved**; Q1, Q3–Q7 remain on their defaults
 - [ ] Retire `mdaizal.github.io` (PLAN Phase 9.4)
-- [ ] Phase 4 — quality gates (SEO service, a11y pass, perf budget, Lighthouse)
+- [ ] Phase 5 — AWS S3 bucket (owner runs the commands)
+- [ ] Phase 6 — CloudFront, TLS, custom error responses; **and the deferred SEO items**
 
 ## Decisions in force (PLAN §0)
 

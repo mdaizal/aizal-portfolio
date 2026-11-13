@@ -28,7 +28,7 @@ import type { SkillGroup } from '../../content/models';
             "
           >
             <span>{{ item.name }}</span>
-            <span class="text-[0.65rem] uppercase tracking-wide opacity-80">
+            <span class="text-[0.65rem] uppercase tracking-wide">
               <span class="sr-only">level: </span>{{ item.level }}
             </span>
           </li>
