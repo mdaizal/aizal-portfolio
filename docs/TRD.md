@@ -381,7 +381,7 @@ Test files: `*.spec.ts`, co-located. Vitest runs in Node with jsdom/happy-dom �
 
 ## 11. AWS — S3
 
-Bucket `{{BUCKET_NAME}}` (suggest `aizal-portfolio-site`), region `{{REGION}}` (suggest `ap-southeast-5` for latency; `us-east-1` is equally free-tier eligible).
+Bucket **`aizal-portfolio-site`**, region **`ap-southeast-2`** (Sydney). The region is permanent — chosen deliberately over the closer `ap-southeast-5` (Malaysia, measured ~7× closer from the operator's machine) because CloudFront caches globally, so viewer latency is identical and only deploy-time uploads and cache-miss origin fetches differ. All three regions are equally free-tier eligible.
 
 | Setting | Value | Why |
 |---------|-------|-----|

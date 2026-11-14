@@ -49,7 +49,8 @@ Mohd Aizal Baharuddin's personal portfolio: an Angular 22 **single-page** static
   - **Still open:** cross-browser spot check (every measurement is Chromium)
 - [ ] PRD §11 open questions — Q2 (Panasonic end date) **resolved**; Q1, Q3–Q7 remain on their defaults
 - [ ] Retire `mdaizal.github.io` (PLAN Phase 9.4)
-- [ ] Phase 5 — AWS S3 bucket (owner runs the commands)
+- [x] **Phase 5 — AWS S3 bucket** — `aizal-portfolio-site` in `ap-southeast-2`, verified against the account: all four public-access blocks on, versioning enabled, tagged, encryption `AES256`, ownership `BucketOwnerEnforced`, static website hosting off, empty
+  - Two steps silently failed first (versioning, tagging) and were caught only by checking the account, not by the reported summary
 - [ ] Phase 6 — CloudFront, TLS, custom error responses; **and the deferred SEO items**
 
 ## Decisions in force (PLAN §0)

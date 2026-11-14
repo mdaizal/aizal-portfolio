@@ -190,7 +190,27 @@ Original plan steps, for reference:
 
 ## Phase 5 — AWS: S3 bucket *(you run these)*
 
-Work from the project root in **git-bash**. Replace `{{BUCKET_NAME}}` (suggest `aizal-portfolio-site`) and `{{REGION}}` (suggest `ap-southeast-5` — Malaysia, closest to you; `us-east-1` is equally free-tier eligible).
+**✅ COMPLETE — verified against the account, not from the operator's summary.**
+
+| Setting | Verified value | Why it matters |
+|---|---|---|
+| Bucket | `aizal-portfolio-site` — `arn:aws:s3:::aizal-portfolio-site` | name confirmed free before creation |
+| Region | **`ap-southeast-2`** (Sydney) — deliberate, see below | permanent; a bucket's region cannot be changed |
+| Block Public Access | all four `true` | ✅ the single most important line — nothing is public |
+| Versioning | `Enabled` | ✅ free rollback for a bad deploy |
+| Default encryption | `AES256` | ✅ on by default for new buckets, but verified rather than assumed |
+| Object ownership | `BucketOwnerEnforced` | ✅ ACLs disabled; access is bucket-policy + IAM only |
+| Static website hosting | **absent** (`NoSuchWebsiteConfiguration`) | ✅ required — website endpoints are HTTP-only and cannot use OAC |
+| Bucket policy | absent (`NoSuchBucketPolicy`) | ✅ correct; CloudFront's OAC policy arrives in Phase 6.3 |
+| Contents | empty | ✅ correct until Phase 6.1 |
+
+**Two steps silently did not take effect** — versioning (`get-bucket-versioning` returned `{}`) and tagging (`NoSuchTagSet`). Both were re-run and now verify. The lesson: `put-*` prints nothing on success, so a clean-looking command sequence is not evidence — the only proof is a `get-*` that returns a real value. The operator's pasted summary also omitted the versioning check entirely, which is precisely the check that would have surfaced it.
+
+**Region decision: `ap-southeast-2` (Sydney), not `ap-southeast-5` (Malaysia).** Measured from the operator's machine, ap-southeast-5 was ~7× closer (66 ms vs 495 ms, TLS-inclusive single request). The bucket nonetheless landed in Sydney because the `LocationConstraint` never reached the create call, and the operator elected to keep it. Rationale is sound: CloudFront caches globally, so **viewer** latency is identical either way — the region only affects deploy-time uploads and origin fetches on cache misses. Recorded because these docs previously suggested ap-southeast-5.
+
+**Root cause of the wrong region: shell variables do not persist between terminal invocations.** `BUCKET`/`REGION` were set in one call and referenced in another, so `"$REGION"` expanded to empty and the CLI fell back to the `~/.aws/config` default. **Owner-run AWS instructions must use literal values, not shell variables.**
+
+Steps as originally specified, with `{{BUCKET_NAME}}` = `aizal-portfolio-site` and `{{REGION}}` = `ap-southeast-2`. Run from the project root in **git-bash**, using **literal values rather than shell variables**.
 
 | Step | Command you run | Output you should see |
 |------|-----------------|-----------------------|
